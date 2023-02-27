@@ -1,35 +1,42 @@
 import java.util.Arrays;
-
 public class homework003 {
-    private void SortUnsorted(int[] a, int lo, int hi) {
-
-        if (hi <= lo)
-            return;
-        int mid = lo + (hi - lo) / 2;
-        SortUnsorted(a, lo, mid);
-        SortUnsorted(a, mid + 1, hi);
-    
-        int[] buf = Arrays.copyOf(a, a.length);
-    
-        for (int k = lo; k <= hi; k++)
-            buf[k] = a[k];
-    
-        int i = lo, j = mid + 1;
-        for (int k = lo; k <= hi; k++) {
-    
-            if (i > mid) {
-                a[k] = buf[j];
-                j++;
-            } else if (j > hi) {
-                a[k] = buf[i];
-                i++;
-            } else if (buf[j] < buf[i]) {
-                a[k] = buf[j];
-                j++;
-            } else {
-                a[k] = buf[i];
-                i++;
-            }
+        public static int[] mergeSort(int[] sortArr) {
+            int[] buffer1 = Arrays.copyOf(sortArr, sortArr.length);
+            int[] buffer2 = new int[sortArr.length];
+            int[] result = mergeSortInner(buffer1, buffer2, 0, sortArr.length);
+            return result;
         }
-    }
+    
+        public static int[] mergeSortInner(int[] buffer1, int[] buffer2, int startIndex, int endIndex) {
+            if (startIndex >= endIndex - 1) {
+                return buffer1;
+            }
+    
+            //уже отсортирован
+            int middle = startIndex + (endIndex - startIndex) / 2;
+            int[] sorted1 = mergeSortInner(buffer1, buffer2, startIndex, middle);
+            int[] sorted2 = mergeSortInner(buffer1, buffer2, middle, endIndex);
+    
+            //слияние
+            int index1 = startIndex;
+            int index2 = middle;
+            int destIndex = startIndex;
+            int[] result = sorted1 == buffer1 ? buffer2 : buffer1;
+            while (index1 < middle && index2 < endIndex) {
+                result[destIndex++] = sorted1[index1] < sorted2[index2]
+                        ? sorted1[index1++] : sorted2[index2++];
+            }
+            while (index1 < middle) {
+                result[destIndex++] = sorted1[index1++];
+            }
+            while (index2 < endIndex) {
+                result[destIndex++] = sorted2[index2++];
+            }
+            return result;
+        }
+        public static void main(String args[]) {
+            int[] sortArr = {12, 6, 4, 1, 15, 33};
+            int[] result = mergeSort(sortArr);
+            System.out.println(Arrays.toString(result));
+        }
 }
